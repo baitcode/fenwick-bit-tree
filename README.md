@@ -2,7 +2,7 @@
 
 Allows efficient prefix sum calculation.
 
-Created for trining purposes to test:
+Created for training purposes to test:
 
 1. rust typesystem, default trait implmentation, enums as a way for polymorphism
 2. memory management and consumption of value
@@ -56,7 +56,7 @@ tree.update(&30.into(), 10);
 
 // Now you can query data.
 // NOTE: FixedSizeFenwickTree will raise error when query goes out of bounds.
-//       GrowingFenwickTree will automatically truncate the range torightmost index.
+//       GrowingFenwickTree will automatically truncate the range to the rightmost index.
 
 assert_eq!(tree.query(&4.into()).unwrap(), 5);
 assert_eq!(tree.query(&15.into()).unwrap(), 15);
