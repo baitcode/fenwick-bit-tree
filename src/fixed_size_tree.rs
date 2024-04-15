@@ -73,7 +73,6 @@ mod tests {
     use crate::FenwickTree;
     use rand::seq::SliceRandom;
     use rand::Rng;
-    extern crate test;
 
     #[test]
     fn edge_case() {
@@ -213,8 +212,16 @@ mod tests {
             }
         }
     }
+}
 
+#[cfg(all(feature = "benchmarks", test))]
+mod benchmarks {
+    extern crate test;
+    use rand::seq::SliceRandom;
+    use rand::Rng;
     use test::Bencher;
+
+    use crate::prelude::*;
 
     fn bench_update(b: &mut Bencher, size: usize) {
         let mut input = vec![];
@@ -298,6 +305,3 @@ mod tests {
         bench_reads(b, 10000000);
     }
 }
-
-// #[bench]
-// mod benchmarks {}

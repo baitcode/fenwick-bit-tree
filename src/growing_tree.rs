@@ -291,44 +291,4 @@ mod tests {
             }
         }
     }
-
-    #[bench]
-    fn bench_1000_writes(b: &mut Bencher) {
-        bench_update(b, 1000);
-    }
-
-    #[bench]
-    fn bench_10000_writes(b: &mut Bencher) {
-        bench_update(b, 10000);
-    }
-
-    #[bench]
-    fn bench_100000_writes(b: &mut Bencher) {
-        bench_update(b, 100000);
-    }
-
-    #[bench]
-    fn bench_10000000_writes(b: &mut Bencher) {
-        bench_update(b, 10000000);
-    }
-
-    #[bench]
-    fn bench_1000_reads(b: &mut Bencher) {
-        bench_reads(b, 1000);
-    }
-
-    #[bench]
-    fn bench_10000_reads(b: &mut Bencher) {
-        bench_reads(b, 10000);
-    }
-
-    #[bench]
-    fn bench_100000_reads(b: &mut Bencher) {
-        bench_reads(b, 100000);
-    }
-
-    #[bench]
-    fn bench_10000000_reads(b: &mut Bencher) {
-        bench_reads(b, 10000000);
-    }
 }

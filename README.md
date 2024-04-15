@@ -6,6 +6,8 @@ Created for trining purposes to test:
 2. memory management and consumption of value
 3. cargo tools, docs, tests, clippy and benchmarks, build and publish.
 
+Code is free to do whatever you feel like.
+
 Provides abstraction for Fenwick tree data structure and 2 implmentations:
 
 - [`prelude::FixedSizeFenwickTree`]
@@ -16,10 +18,16 @@ implements [`FenwickTreeValue`] trait. [`FenwickTreeValue`] is automatically
 implmented for all primitive numeric types that support [`std::ops::AddAssign`],
 [`std::ops::Sub`], [`core::cmp::PartialEq`] and [`Copy`] traits.
 
+## Install
+
+```
+cargo install fenwick_bit_tree
+```
+
 ## Basic usage:
 
 ```rust
-use crate::prelude::FixedSizeFenwickTree;
+use fenwick_bit_tree::prelude::*;
 
 // Create the tree with capacity for 32 aggregated [`i32`] data points.
 // One can use whole usize range to store datapoints for unicode timestamps
@@ -45,4 +53,16 @@ assert_eq!(tree.query(&31.into()).unwrap(), 35);
 
 let val = tree.range_query(&2.into(), &15.into()).unwrap(); // Will return aggregated sum of all values between those keys.
 assert_eq!(val, 14);
+```
+
+## Test
+
+```
+cargo test
+```
+
+## Benchmarks
+
+```
+cargo bench --features benchmarks
 ```

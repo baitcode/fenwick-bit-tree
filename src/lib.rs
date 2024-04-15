@@ -4,6 +4,8 @@
 //!     1) rust typesystem, default trait implmentation, enums as a way for polymorphism
 //!     2) memory management and consumption of value
 //!     3) cargo tools, docs, tests, clippy and benchmarks, build and publish.
+//!
+//! Code is free to do whatever you feel like.
 //! 
 //! Provides abstraction for Fenwick tree data structure and 2 implmentations:
 //!  - [`prelude::FixedSizeFenwickTree`]
@@ -17,7 +19,7 @@
 //! Basic usage:
 //! 
 //! ```rust
-//! use crate::prelude::FixedSizeFenwickTree;
+//! use fenwick_bit_tree::prelude::*;
 //! 
 //! // Create the tree with capacity for 32 aggregated [`i32`] data points. 
 //! // One can use whole usize range to store datapoints for unicode timestamps
@@ -41,8 +43,8 @@
 //!
 //! // Also allows making range queries
 //! 
-//! let val = tree.range_query(&2.into(), &15.into()).unwrap(); // Will return aggregated sum of all values between those keys.
-//!  assert_eq!(val, 14);
+//! let val = tree.range_query(&2.into(), &16.into()).unwrap(); // Will return aggregated sum of all values between those keys.
+//! assert_eq!(val, 10);
 //! ```
 
 #![forbid(unsafe_code)]
@@ -61,6 +63,7 @@ pub mod prelude {
     pub use crate::FenwickTreeValue;
     pub use crate::fixed_size_tree::FixedSizeFenwickTree;
     pub use crate::growing_tree::GrowingFenwickTree;
+    pub use crate::FenwickTree;
 }
 
 fn least_significant_bit(idx: usize) -> usize {
