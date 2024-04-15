@@ -1,5 +1,7 @@
 //! Slighly over-engineered Fenwick Tree implmentation.
 //! 
+//! Allows efficient prefix sum calculation.
+//! 
 //! Created for trining purposes to test: 
 //!     1) rust typesystem, default trait implmentation, enums as a way for polymorphism
 //!     2) memory management and consumption of value
@@ -95,13 +97,36 @@ where T: Default + Copy //
     }
 }
 
-/// Fenwick tree trait, API of that datastructure
+/// Fenwick tree trait, API of that data structure
 pub trait FenwickTree {
     type Value: FenwickTreeValue;
 
+    /// Returns sum of values across all indexes lesser or equal than `idx`.
+    ///
+    /// # Errors
+    ///
+    /// This function will returns an error if idx is out of bounds.
+    /// GrowingFenwick tree implementation never returns error.
+    /// 
     fn query(&self, idx: &TreeIndex) -> Result<Self::Value, String>;
+    
+    /// Add new value to the `idx` stored value, which is 0 by default. 
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if idx is out of bounds.
+    /// GrowingFenwick tree implementation never returns error.
+    /// 
     fn update(&mut self, idx: &TreeIndex, value: Self::Value) -> Result<(), String>;
 
+    /// Returns sum of values across all indexes in between `from` and `to` indexes 
+    /// (including edges).
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if any index is out of bounds.
+    /// GrowingFenwick tree implementation never return error.
+    /// 
     fn range_query(&self, from: &TreeIndex, to: &TreeIndex) -> Result<Self::Value, String> {
         let from_sum = self.query(from)?;
         let to_sum = self.query(to)?;
@@ -109,7 +134,7 @@ pub trait FenwickTree {
     }
 }
 
-/// For the sake of clarity Tree supports 2 types of indexing [`TreeIndex::External`] is meant to be used 
+/// For the sake of clarity Tree supports 2 types of indexing. [`TreeIndex::External`] is meant to be used 
 /// by library consumer. While [`TreeIndex::Internal`] is used for purposes to make tree reindexing code more
 /// understable and maintainable. [`usize`] can be automatically converted using `into()` into the [`TreeIndex::External`]
 #[derive(Debug, Clone, Copy)]
