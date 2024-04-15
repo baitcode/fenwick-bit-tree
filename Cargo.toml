@@ -19,3 +19,4 @@ rand = "0.8.5"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
+cargo-readme = "3.3.1"

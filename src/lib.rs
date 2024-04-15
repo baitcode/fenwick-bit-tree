@@ -1,4 +1,4 @@
-//! Slighly over-engineered Fenwick Tree implmentation.
+//! # Slighly over-engineered Fenwick Tree implmentation.
 //! 
 //! Allows efficient prefix sum calculation.
 //! 
@@ -17,8 +17,26 @@
 //! implements [`FenwickTreeValue`] trait. [`FenwickTreeValue`] is automatically 
 //! implmented for all primitive numeric types that support [`std::ops::AddAssign`], 
 //! [`std::ops::Sub`], [`core::cmp::PartialEq`] and [`Copy`] traits.
+//!
+//! ## Installation  
+//!
+//! ```bash
+//! cargo install fenwick_bit_tree
+//! ```
 //! 
-//! Basic usage:
+//! ## Test
+//! 
+//! ```bash
+//! cargo test
+//! ```
+//! 
+//! ## Benchmarks
+//! 
+//! ```bash
+//! cargo bench --features benchmarks
+//! ```
+//! 
+//! ## Basic usage:
 //! 
 //! ```rust
 //! use fenwick_bit_tree::prelude::*;

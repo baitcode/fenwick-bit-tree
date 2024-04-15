@@ -1,30 +1,44 @@
-## Slighly over-engineered FenwickTree implmentation.
+# fenwick-bit-tree
+
+## Slighly over-engineered Fenwick Tree implmentation.
+
+Allows efficient prefix sum calculation.
 
 Created for trining purposes to test:
-
-1. rust typesystem, default trait implmentation, enums as a way for polymorphism
-2. memory management and consumption of value
-3. cargo tools, docs, tests, clippy and benchmarks, build and publish.
+    1) rust typesystem, default trait implmentation, enums as a way for polymorphism
+    2) memory management and consumption of value
+    3) cargo tools, docs, tests, clippy and benchmarks, build and publish.
 
 Code is free to do whatever you feel like.
 
 Provides abstraction for Fenwick tree data structure and 2 implmentations:
-
-- [`prelude::FixedSizeFenwickTree`]
-- [`prelude::GrowingFenwickTree`]
+ - [`prelude::FixedSizeFenwickTree`]
+ - [`prelude::GrowingFenwickTree`]
 
 Key space for a tree lies within [`usize`] range. Tree support any value that
 implements [`FenwickTreeValue`] trait. [`FenwickTreeValue`] is automatically
 implmented for all primitive numeric types that support [`std::ops::AddAssign`],
 [`std::ops::Sub`], [`core::cmp::PartialEq`] and [`Copy`] traits.
 
-## Install
+### Installation
 
-```
+```bash
 cargo install fenwick_bit_tree
 ```
 
-## Basic usage:
+### Test
+
+```bash
+cargo test
+```
+
+### Benchmarks
+
+```bash
+cargo bench --features benchmarks
+```
+
+### Basic usage:
 
 ```rust
 use fenwick_bit_tree::prelude::*;
@@ -51,18 +65,8 @@ assert_eq!(tree.query(&31.into()).unwrap(), 35);
 
 // Also allows making range queries
 
-let val = tree.range_query(&2.into(), &15.into()).unwrap(); // Will return aggregated sum of all values between those keys.
-assert_eq!(val, 14);
+let val = tree.range_query(&2.into(), &16.into()).unwrap(); // Will return aggregated sum of all values between those keys.
+assert_eq!(val, 10);
 ```
 
-## Test
-
-```
-cargo test
-```
-
-## Benchmarks
-
-```
-cargo bench --features benchmarks
-```
+License: MIT OR Apache-2.0
