@@ -1,5 +1,3 @@
-# fenwick-bit-tree
-
 ## Slighly over-engineered Fenwick Tree implmentation.
 
 Allows efficient prefix sum calculation.
@@ -68,5 +66,7 @@ assert_eq!(tree.query(&31.into()).unwrap(), 35);
 let val = tree.range_query(&2.into(), &16.into()).unwrap(); // Will return aggregated sum of all values between those keys.
 assert_eq!(val, 10);
 ```
+
+Current version: 1.0.0
 
 License: MIT OR Apache-2.0
