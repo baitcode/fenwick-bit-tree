@@ -1,4 +1,4 @@
-//! Slighly over-engineered FenwickTree implmentation.
+//! Slighly over-engineered Fenwick Tree implmentation.
 //! 
 //! Created for trining purposes to test: 
 //!     1) rust typesystem, default trait implmentation, enums as a way for polymorphism
