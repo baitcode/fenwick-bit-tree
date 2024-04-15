@@ -7,6 +7,7 @@ include = ["src/*.rs", "Cargo.toml"]
 rust-version = "1.76.0"
 license = "MIT OR Apache-2.0"
 description = "Slighly over-engineered FenwickTree implmentation."
+repository = "https://github.com/baitcode/fenwick-bit-tree"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
