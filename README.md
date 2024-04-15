@@ -3,9 +3,10 @@
 Allows efficient prefix sum calculation.
 
 Created for trining purposes to test:
-    1) rust typesystem, default trait implmentation, enums as a way for polymorphism
-    2) memory management and consumption of value
-    3) cargo tools, docs, tests, clippy and benchmarks, build and publish.
+
+1. rust typesystem, default trait implmentation, enums as a way for polymorphism
+2. memory management and consumption of value
+3. cargo tools, docs, tests, clippy and benchmarks, build and publish.
 
 Code is free to do whatever you feel like.
 
