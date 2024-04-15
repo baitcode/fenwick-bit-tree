@@ -2,7 +2,7 @@
 //! 
 //! Allows efficient prefix sum calculation.
 //! 
-//! Created for trining purposes to test: 
+//! Created for training purposes to test: 
 //!
 //! 1. rust typesystem, default trait implmentation, enums as a way for polymorphism
 //! 2. memory management and consumption of value
