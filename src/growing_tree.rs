@@ -43,14 +43,17 @@ impl<T: FenwickTreeValue> GrowingFenwickTree<T> {
                 .unwrap()
         };
 
-        let sum_from = self.query(&aggregate_from).unwrap_or_default();
-        let sum_till = self.query(&highest_index_before_resize).unwrap();
-        let value = sum_till.substract(sum_from);
+        let sum_from = aggregate_from
+            .to_external()
+            .and_then(|idx| self.query(*idx))
+            .unwrap_or_default();
 
-        // TODO: why is it broken?
-        // if value != T::default() {
-        //      return;
-        // }
+        let sum_till = highest_index_before_resize
+            .to_external()
+            .and_then(|idx| self.query(*idx))
+            .unwrap_or_default();
+
+        let value = sum_till.substract(sum_from);
 
         for data_position in highest_index_before_resize
             .lsb_ascending(self.size() - 1)
@@ -79,8 +82,8 @@ impl<T> std::ops::IndexMut<TreeIndex> for GrowingFenwickTree<T> {
 impl<T: FenwickTreeValue> FenwickTree for GrowingFenwickTree<T> {
     type Value = T;
 
-    fn query(&self, idx: &TreeIndex) -> Result<T, String> {
-        let mut idx = idx.to_external()?;
+    fn query(&self, idx: usize) -> Result<T, String> {
+        let mut idx: TreeIndex = idx.into();
 
         if self.size() <= *idx.to_internal() {
             idx = TreeIndex::Internal {
@@ -98,8 +101,8 @@ impl<T: FenwickTreeValue> FenwickTree for GrowingFenwickTree<T> {
         Ok(res)
     }
 
-    fn update(&mut self, idx: &TreeIndex, value: Self::Value) -> Result<(), String> {
-        let idx = idx.to_external()?;
+    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), String> {
+        let idx: TreeIndex = idx.into();
 
         if *idx.to_internal() > self.size() - 1 {
             self.resize(&idx)
@@ -125,60 +128,60 @@ mod tests {
     #[test]
     fn test_no_upper_bound_error_is_raised() {
         let tree = GrowingFenwickTree::<i32>::new(0);
-        assert_eq!(tree.query(&100.into()).unwrap(), 0);
-        assert_eq!(tree.range_query(&10.into(), &100.into()).unwrap(), 0);
+        assert_eq!(tree.query(100).unwrap(), 0);
+        assert_eq!(tree.range_query(10, 100).unwrap(), 0);
     }
 
     #[test]
     fn tree_grows_one_by_one() {
         let mut tree = GrowingFenwickTree::<i32>::new(1);
-        tree.update(&3.into(), 1).unwrap();
-        assert_eq!(tree.query(&3.into()).unwrap(), 1);
+        tree.update(3, 1).unwrap();
+        assert_eq!(tree.query(3).unwrap(), 1);
 
-        tree.update(&0.into(), 1).unwrap();
-        assert_eq!(tree.query(&3.into()).unwrap(), 2);
+        tree.update(0, 1).unwrap();
+        assert_eq!(tree.query(3).unwrap(), 2);
     }
 
     #[test]
     fn tree_suddenly_grows_much_bigger() {
         let mut tree = GrowingFenwickTree::<i32>::new(2);
-        tree.update(&0.into(), 1).unwrap();
-        assert_eq!(tree.query(&0.into()).unwrap(), 1);
+        tree.update(0, 1).unwrap();
+        assert_eq!(tree.query(0).unwrap(), 1);
 
-        tree.update(&1.into(), 1).unwrap();
-        assert_eq!(tree.query(&1.into()).unwrap(), 2);
+        tree.update(1, 1).unwrap();
+        assert_eq!(tree.query(1).unwrap(), 2);
 
-        tree.update(&7.into(), 0).unwrap();
-        assert_eq!(tree.query(&7.into()).unwrap(), 2);
+        tree.update(7, 0).unwrap();
+        assert_eq!(tree.query(7).unwrap(), 2);
     }
 
     #[test]
     fn simple_tree_generation_with_queries() {
         let mut tree = GrowingFenwickTree::<i32>::new(11);
         for i in 0..32 {
-            if let Err(_) = tree.update(&i.into(), 1) {
+            if let Err(_) = tree.update(i, 1) {
                 assert!(false)
             }
         }
-        assert_eq!(tree.query(&3.into()).unwrap(), 4); // points at [0, 1, 2, 3, 4]
-        assert_eq!(tree.query(&0.into()).unwrap(), 1);
-        assert_eq!(tree.query(&31.into()).unwrap(), 32);
+        assert_eq!(tree.query(3).unwrap(), 4); // points at [0, 1, 2, 3, 4]
+        assert_eq!(tree.query(0).unwrap(), 1);
+        assert_eq!(tree.query(31).unwrap(), 32);
     }
 
     #[test]
     fn test_range_queries() {
         let mut tree = GrowingFenwickTree::<i32>::new(0);
         for i in 0..=29 {
-            if let Err(_) = tree.update(&i.into(), 1) {
+            if let Err(_) = tree.update(i, 1) {
                 assert!(false)
             }
         }
 
-        match tree.range_query(&10.into(), &20.into()) {
+        match tree.range_query(10, 20) {
             Ok(10) => assert!(true),
             _ => assert!(false),
         }
-        match tree.range_query(&8.into(), &29.into()) {
+        match tree.range_query(8, 29) {
             Ok(21) => assert!(true),
             _ => assert!(false),
         }
@@ -188,11 +191,11 @@ mod tests {
     fn update_existent_value() {
         let mut tree = GrowingFenwickTree::<i32>::new(0);
         for _i in 0..32 {
-            if let Err(_) = tree.update(&0.into(), 1) {
+            if let Err(_) = tree.update(0, 1) {
                 assert!(false)
             }
         }
-        let res = tree.query(&0.into()).unwrap();
+        let res = tree.query(0).unwrap();
         assert_eq!(res, 32);
     }
 
@@ -208,7 +211,7 @@ mod tests {
 
         let mut tree = GrowingFenwickTree::<i32>::new(0);
         for i in 0..size {
-            if let Err(_) = tree.update(&i.into(), *input.get(i).unwrap()) {
+            if let Err(_) = tree.update(i, *input.get(i).unwrap()) {
                 assert!(false)
             }
         }
@@ -217,7 +220,7 @@ mod tests {
         for i in 0..size {
             sum += *input.get(i).unwrap();
 
-            if let Ok(res) = tree.query(&i.into()) {
+            if let Ok(res) = tree.query(i) {
                 assert_eq!(res, sum);
             } else {
                 assert!(false)
@@ -240,7 +243,7 @@ mod tests {
         let mut random_indexes: Vec<usize> = (0..size).collect();
         random_indexes.shuffle(&mut rng);
         for i in random_indexes {
-            if let Err(_) = tree.update(&i.into(), *input.get(i).unwrap()) {
+            if let Err(_) = tree.update(i, *input.get(i).unwrap()) {
                 assert!(false)
             }
         }
@@ -248,7 +251,7 @@ mod tests {
         let mut sum = 0;
         for i in 0..size {
             sum += *input.get(i).unwrap();
-            if let Ok(res) = tree.query(&i.into()) {
+            if let Ok(res) = tree.query(i) {
                 assert_eq!(res, sum);
             } else {
                 assert!(false);
@@ -271,12 +274,12 @@ mod tests {
         let mut random_indexes: Vec<usize> = (0..size).collect();
         random_indexes.shuffle(&mut rng);
         for i in random_indexes {
-            let sum_before_update = tree.query(&i.into()).unwrap();
+            let sum_before_update = tree.query(i).unwrap();
             let value_to_update = *input.get(i).unwrap();
-            if let Err(_) = tree.update(&i.into(), value_to_update) {
+            if let Err(_) = tree.update(i, value_to_update) {
                 assert!(false)
             }
-            let sum_after_update = tree.query(&i.into()).unwrap();
+            let sum_after_update = tree.query(i).unwrap();
             assert_eq!(sum_after_update - sum_before_update, value_to_update)
         }
 
@@ -284,7 +287,7 @@ mod tests {
         for i in 0..size {
             sum += *input.get(i).unwrap();
 
-            if let Ok(res) = tree.query(&i.into()) {
+            if let Ok(res) = tree.query(i) {
                 assert_eq!(res, sum);
             } else {
                 assert!(false)

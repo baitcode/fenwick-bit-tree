@@ -48,23 +48,23 @@ let mut tree = FixedSizeFenwickTree::<i32>::new(32);
 
 // Add values
 
-tree.update(&0.into(), 1);
-tree.update(&0.into(), 4); // Will aggregate value at index 0 so it would be 5
-tree.update(&10.into(), 10);
-tree.update(&20.into(), 10);
-tree.update(&30.into(), 10);
+tree.update(0, 1);
+tree.update(0, 4); // Will aggregate value at index 0 so it would be 5
+tree.update(10, 10);
+tree.update(20, 10);
+tree.update(30, 10);
 
 // Now you can query data.
 // NOTE: FixedSizeFenwickTree will raise error when query goes out of bounds.
 //       GrowingFenwickTree will automatically truncate the range to the rightmost index.
 
-assert_eq!(tree.query(&4.into()).unwrap(), 5);
-assert_eq!(tree.query(&15.into()).unwrap(), 15);
-assert_eq!(tree.query(&31.into()).unwrap(), 35);
+assert_eq!(tree.query(4).unwrap(), 5);
+assert_eq!(tree.query(15).unwrap(), 15);
+assert_eq!(tree.query(31).unwrap(), 35);
 
 // Also allows making range queries
 
-let val = tree.range_query(&2.into(), &16.into()).unwrap(); // Will return aggregated sum of all values between those keys.
+let val = tree.range_query(2, 16).unwrap(); // Will return aggregated sum of all values between those keys.
 assert_eq!(val, 10);
 ```
 

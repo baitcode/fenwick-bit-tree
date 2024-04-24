@@ -48,23 +48,23 @@
 //!
 //! // Add values
 //! 
-//! tree.update(&0.into(), 1); 
-//! tree.update(&0.into(), 4); // Will aggregate value at index 0 so it would be 5
-//! tree.update(&10.into(), 10);
-//! tree.update(&20.into(), 10);
-//! tree.update(&30.into(), 10);
+//! tree.update(0, 1); 
+//! tree.update(0, 4); // Will aggregate value at index 0 so it would be 5
+//! tree.update(10, 10);
+//! tree.update(20, 10);
+//! tree.update(30, 10);
 //! 
 //! // Now you can query data. 
 //! // NOTE: FixedSizeFenwickTree will raise error when query goes out of bounds.
 //! //       GrowingFenwickTree will automatically truncate the range to the rightmost index. 
 //! 
-//! assert_eq!(tree.query(&4.into()).unwrap(), 5); 
-//! assert_eq!(tree.query(&15.into()).unwrap(), 15);
-//! assert_eq!(tree.query(&31.into()).unwrap(), 35);
+//! assert_eq!(tree.query(4).unwrap(), 5); 
+//! assert_eq!(tree.query(15).unwrap(), 15);
+//! assert_eq!(tree.query(31).unwrap(), 35);
 //!
 //! // Also allows making range queries
 //! 
-//! let val = tree.range_query(&2.into(), &16.into()).unwrap(); // Will return aggregated sum of all values between those keys.
+//! let val = tree.range_query(2, 16).unwrap(); // Will return aggregated sum of all values between those keys.
 //! assert_eq!(val, 10);
 //! ```
 
@@ -127,7 +127,7 @@ pub trait FenwickTree {
     /// This function will returns an error if idx is out of bounds.
     /// GrowingFenwick tree implementation never returns error.
     /// 
-    fn query(&self, idx: &TreeIndex) -> Result<Self::Value, String>;
+    fn query(&self, idx: usize) -> Result<Self::Value, String>;
     
     /// Add new value to the `idx` stored value, which is 0 by default. 
     ///
@@ -136,7 +136,7 @@ pub trait FenwickTree {
     /// This function will return an error if idx is out of bounds.
     /// GrowingFenwick tree implementation never returns error.
     /// 
-    fn update(&mut self, idx: &TreeIndex, value: Self::Value) -> Result<(), String>;
+    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), String>;
 
     /// Returns sum of values across all indexes in between `from` and `to` indexes 
     /// (including edges).
@@ -146,7 +146,7 @@ pub trait FenwickTree {
     /// This function will return an error if any index is out of bounds.
     /// GrowingFenwick tree implementation never return error.
     /// 
-    fn range_query(&self, from: &TreeIndex, to: &TreeIndex) -> Result<Self::Value, String> {
+    fn range_query(&self, from: usize, to: usize) -> Result<Self::Value, String> {
         let from_sum = self.query(from)?;
         let to_sum = self.query(to)?;
         Ok(to_sum.substract(from_sum))
@@ -157,12 +157,13 @@ pub trait FenwickTree {
 /// by library consumer. While [`TreeIndex::Internal`] is used for purposes to make tree reindexing code more
 /// understable and maintainable. [`usize`] can be automatically converted using `into()` into the [`TreeIndex::External`]
 #[derive(Debug, Clone, Copy)]
-pub enum TreeIndex {
+enum TreeIndex {
     Internal { val: usize },
     External { val: usize },
 }
 
 impl TreeIndex {
+
     fn to_internal(self) -> Self {
         match self {
             TreeIndex::Internal { val: _ } => self,
@@ -244,7 +245,7 @@ impl DerefMut for TreeIndex {
 
 /// Iterator that implements changing value by deduction of the least significant bit and 
 /// returning result
-pub struct LeastSignificantBitDescentingChain {
+struct LeastSignificantBitDescentingChain {
     idx: TreeIndex,
 }
 

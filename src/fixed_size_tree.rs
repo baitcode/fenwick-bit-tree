@@ -33,9 +33,8 @@ impl<T: FenwickTreeValue> std::ops::IndexMut<TreeIndex> for FixedSizeFenwickTree
 impl<T: FenwickTreeValue> FenwickTree for FixedSizeFenwickTree<T> {
     type Value = T;
 
-    fn query(&self, idx: &TreeIndex) -> Result<T, String> {
-        // TODO: need to discuss
-        let idx = idx.to_external()?;
+    fn query(&self, idx: usize) -> Result<T, String> {
+        let idx: TreeIndex = idx.into();
 
         if *idx >= self.size() {
             return Err("Index is out of bounds.".to_string());
@@ -50,9 +49,8 @@ impl<T: FenwickTreeValue> FenwickTree for FixedSizeFenwickTree<T> {
         Ok(res)
     }
 
-    fn update(&mut self, idx: &TreeIndex, value: Self::Value) -> Result<(), String> {
-        // TODO: need to discuss
-        let idx = idx.to_external()?;
+    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), String> {
+        let idx: TreeIndex = idx.into();
 
         if *idx > self.data.len() {
             return Err("Index is out of bounds".to_string());
@@ -77,21 +75,21 @@ mod tests {
     #[test]
     fn edge_case() {
         let mut tree = FixedSizeFenwickTree::<i32>::new(4);
-        tree.update(&3.into(), 1).unwrap();
-        assert_eq!(tree.query(&3.into()).unwrap(), 1);
+        tree.update(3, 1).unwrap();
+        assert_eq!(tree.query(3).unwrap(), 1);
     }
 
     #[test]
     fn simple_tree_generation_with_queries() {
         let mut tree = FixedSizeFenwickTree::<i32>::new(32);
         for i in 0..32 {
-            if let Err(_) = tree.update(&i.into(), 1) {
+            if let Err(_) = tree.update(i, 1) {
                 assert!(false)
             }
         }
-        assert_eq!(tree.query(&4.into()).unwrap(), 5); // points at [0, 1, 2, 3, 4]
-        assert_eq!(tree.query(&0.into()).unwrap(), 1);
-        assert_eq!(tree.query(&31.into()).unwrap(), 32);
+        assert_eq!(tree.query(4).unwrap(), 5); // points at [0, 1, 2, 3, 4]
+        assert_eq!(tree.query(0).unwrap(), 1);
+        assert_eq!(tree.query(31).unwrap(), 32);
     }
 
     // TODO: #[should_panic]?
@@ -99,7 +97,7 @@ mod tests {
     fn tree_indexing_overflow() {
         let tree = FixedSizeFenwickTree::<i32>::new(0);
 
-        match tree.query(&1.into()) {
+        match tree.query(1) {
             Ok(_) => assert!(false),
             Err(message) => assert_eq!(message, "Index is out of bounds."),
         }
@@ -109,11 +107,11 @@ mod tests {
     fn update_existent_value() {
         let mut tree = FixedSizeFenwickTree::<i32>::new(32);
         for _i in 0..32 {
-            if let Err(_) = tree.update(&0.into(), 1) {
+            if let Err(_) = tree.update(0, 1) {
                 assert!(false)
             }
         }
-        let res = tree.query(&1.into()).unwrap();
+        let res = tree.query(1).unwrap();
         assert_eq!(res, 32);
     }
 
@@ -129,7 +127,7 @@ mod tests {
 
         let mut tree = FixedSizeFenwickTree::<i32>::new(size);
         for i in 0..size {
-            if let Err(_) = tree.update(&i.into(), *input.get(i).unwrap()) {
+            if let Err(_) = tree.update(i, *input.get(i).unwrap()) {
                 assert!(false)
             }
         }
@@ -138,7 +136,7 @@ mod tests {
         for i in 0..size {
             sum += *input.get(i).unwrap();
 
-            if let Ok(res) = tree.query(&i.into()) {
+            if let Ok(res) = tree.query(i) {
                 assert_eq!(res, sum);
             } else {
                 assert!(false)
@@ -161,7 +159,7 @@ mod tests {
         let mut random_indexes: Vec<usize> = (0..size).collect();
         random_indexes.shuffle(&mut rng);
         for i in random_indexes {
-            if let Err(_) = tree.update(&i.into(), *input.get(i).unwrap()) {
+            if let Err(_) = tree.update(i, *input.get(i).unwrap()) {
                 assert!(false)
             }
         }
@@ -169,7 +167,7 @@ mod tests {
         let mut sum = 0;
         for i in 0..size {
             sum += *input.get(i).unwrap();
-            if let Ok(res) = tree.query(&i.into()) {
+            if let Ok(res) = tree.query(i) {
                 assert_eq!(res, sum);
             } else {
                 assert!(false);
@@ -192,12 +190,12 @@ mod tests {
         let mut random_indexes: Vec<usize> = (0..size).collect();
         random_indexes.shuffle(&mut rng);
         for i in random_indexes {
-            let sum_before_update = tree.query(&i.into()).unwrap();
+            let sum_before_update = tree.query(i).unwrap();
             let value_to_update = *input.get(i).unwrap();
-            if let Err(_) = tree.update(&i.into(), value_to_update) {
+            if let Err(_) = tree.update(i, value_to_update) {
                 assert!(false)
             }
-            let sum_after_update = tree.query(&i.into()).unwrap();
+            let sum_after_update = tree.query(i).unwrap();
             assert_eq!(sum_after_update - sum_before_update, value_to_update)
         }
 
@@ -205,7 +203,7 @@ mod tests {
         for i in 0..size {
             sum += *input.get(i).unwrap();
 
-            if let Ok(res) = tree.query(&i.into()) {
+            if let Ok(res) = tree.query(i) {
                 assert_eq!(res, sum);
             } else {
                 assert!(false)
@@ -238,7 +236,7 @@ mod benchmarks {
         b.iter(|| {
             let i = *random_indexes.choose(&mut rng).unwrap();
             let value_to_update = *input.get(i).unwrap();
-            tree.update(&i.into(), value_to_update).unwrap()
+            tree.update(i, value_to_update).unwrap()
         });
     }
 
@@ -256,12 +254,12 @@ mod benchmarks {
         for _i in 0..size {
             let i = *random_indexes.choose(&mut rng).unwrap();
             let value_to_update = *input.get(i).unwrap();
-            tree.update(&i.into(), value_to_update).unwrap()
+            tree.update(i, value_to_update).unwrap()
         }
 
         b.iter(|| {
             let i = *random_indexes.choose(&mut rng).unwrap();
-            tree.query(&i.into()).unwrap();
+            tree.query(i).unwrap();
         });
     }
 
