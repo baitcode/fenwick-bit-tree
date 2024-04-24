@@ -85,6 +85,7 @@ pub mod prelude {
     pub use crate::fixed_size_tree::FixedSizeFenwickTree;
     pub use crate::growing_tree::GrowingFenwickTree;
     pub use crate::FenwickTree;
+    pub use crate::TreeError;
 }
 
 fn least_significant_bit(idx: usize) -> usize {
@@ -127,7 +128,7 @@ pub trait FenwickTree {
     /// This function will returns an error if idx is out of bounds.
     /// GrowingFenwick tree implementation never returns error.
     /// 
-    fn query(&self, idx: usize) -> Result<Self::Value, String>;
+    fn query(&self, idx: usize) -> Result<Self::Value, TreeError>;
     
     /// Add new value to the `idx` stored value, which is 0 by default. 
     ///
@@ -136,7 +137,7 @@ pub trait FenwickTree {
     /// This function will return an error if idx is out of bounds.
     /// GrowingFenwick tree implementation never returns error.
     /// 
-    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), String>;
+    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), TreeError>;
 
     /// Returns sum of values across all indexes in between `from` and `to` indexes 
     /// (including edges).
@@ -146,7 +147,7 @@ pub trait FenwickTree {
     /// This function will return an error if any index is out of bounds.
     /// GrowingFenwick tree implementation never return error.
     /// 
-    fn range_query(&self, from: usize, to: usize) -> Result<Self::Value, String> {
+    fn range_query(&self, from: usize, to: usize) -> Result<Self::Value, TreeError> {
         let from_sum = self.query(from)?;
         let to_sum = self.query(to)?;
         Ok(to_sum.substract(from_sum))
@@ -160,6 +161,11 @@ pub trait FenwickTree {
 enum TreeIndex {
     Internal { val: usize },
     External { val: usize },
+}
+
+#[derive(Debug, PartialEq)]
+pub enum TreeError {
+    IndexOutOfBounds( usize )
 }
 
 impl TreeIndex {

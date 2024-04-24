@@ -1,4 +1,4 @@
-use crate::{FenwickTree, FenwickTreeValue, TreeIndex};
+use crate::{FenwickTree, FenwickTreeValue, TreeError, TreeIndex};
 
 pub struct GrowingFenwickTree<T> {
     data: Vec<T>,
@@ -15,13 +15,14 @@ impl<T: FenwickTreeValue> GrowingFenwickTree<T> {
         self.data.len()
     }
 
-    fn resize(&mut self, idx: &TreeIndex) {
+    fn resize(&mut self, idx: &TreeIndex) -> Result<(), TreeError> {
         let size_before_resize = self.size();
 
+        // TODO: resize should grow to the closest including power of 2
         self.data.resize(*idx.to_internal() + 1, T::default());
 
         if size_before_resize <= 1 {
-            return;
+            return Ok(());
         }
 
         let highest_index_before_resize = TreeIndex::Internal {
@@ -45,13 +46,11 @@ impl<T: FenwickTreeValue> GrowingFenwickTree<T> {
 
         let sum_from = aggregate_from
             .to_external()
-            .and_then(|idx| self.query(*idx))
-            .unwrap_or_default();
+            .map_or(Ok(T::default()), |idx| self.query(*idx))?;
 
         let sum_till = highest_index_before_resize
             .to_external()
-            .and_then(|idx| self.query(*idx))
-            .unwrap_or_default();
+            .map_or(Ok(T::default()), |idx| self.query(*idx))?;
 
         let value = sum_till.substract(sum_from);
 
@@ -62,6 +61,8 @@ impl<T: FenwickTreeValue> GrowingFenwickTree<T> {
             let data_position = data_position.to_internal();
             self[data_position].store_value(&value);
         }
+
+        Ok(())
     }
 }
 
@@ -82,7 +83,7 @@ impl<T> std::ops::IndexMut<TreeIndex> for GrowingFenwickTree<T> {
 impl<T: FenwickTreeValue> FenwickTree for GrowingFenwickTree<T> {
     type Value = T;
 
-    fn query(&self, idx: usize) -> Result<T, String> {
+    fn query(&self, idx: usize) -> Result<T, TreeError> {
         let mut idx: TreeIndex = idx.into();
 
         if self.size() <= *idx.to_internal() {
@@ -101,11 +102,11 @@ impl<T: FenwickTreeValue> FenwickTree for GrowingFenwickTree<T> {
         Ok(res)
     }
 
-    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), String> {
+    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), TreeError> {
         let idx: TreeIndex = idx.into();
 
         if *idx.to_internal() > self.size() - 1 {
-            self.resize(&idx)
+            self.resize(&idx)?
         }
 
         for data_position in idx.lsb_ascending(self.size() - 1) {
@@ -127,7 +128,7 @@ mod tests {
 
     #[test]
     fn empty_tree_query() {
-        let mut tree = GrowingFenwickTree::<i32>::new(0);
+        let tree = GrowingFenwickTree::<i32>::new(0);
         assert!(tree.query(0).is_ok_and(|val| val == 0));
         assert!(tree.query(1).is_ok_and(|val| val == 0));
     }

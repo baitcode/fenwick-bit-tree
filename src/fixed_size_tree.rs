@@ -1,4 +1,4 @@
-use crate::{FenwickTree, FenwickTreeValue, TreeIndex};
+use crate::{FenwickTree, FenwickTreeValue, TreeError, TreeIndex};
 
 pub struct FixedSizeFenwickTree<T: FenwickTreeValue> {
     data: Vec<T>,
@@ -33,11 +33,11 @@ impl<T: FenwickTreeValue> std::ops::IndexMut<TreeIndex> for FixedSizeFenwickTree
 impl<T: FenwickTreeValue> FenwickTree for FixedSizeFenwickTree<T> {
     type Value = T;
 
-    fn query(&self, idx: usize) -> Result<T, String> {
+    fn query(&self, idx: usize) -> Result<T, TreeError> {
         let idx: TreeIndex = idx.into();
 
         if *idx >= self.size() {
-            return Err("Index is out of bounds.".to_string());
+            return Err(TreeError::IndexOutOfBounds(*idx));
         }
 
         let mut res = T::default();
@@ -49,11 +49,11 @@ impl<T: FenwickTreeValue> FenwickTree for FixedSizeFenwickTree<T> {
         Ok(res)
     }
 
-    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), String> {
+    fn update(&mut self, idx: usize, value: Self::Value) -> Result<(), TreeError> {
         let idx: TreeIndex = idx.into();
 
         if *idx > self.data.len() {
-            return Err("Index is out of bounds".to_string());
+            return Err(TreeError::IndexOutOfBounds(*idx));
         }
 
         for data_position in idx.lsb_ascending(self.size()) {
@@ -68,7 +68,7 @@ impl<T: FenwickTreeValue> FenwickTree for FixedSizeFenwickTree<T> {
 #[cfg(test)]
 mod tests {
     use crate::fixed_size_tree::FixedSizeFenwickTree;
-    use crate::FenwickTree;
+    use crate::{FenwickTree, TreeError};
     use rand::seq::SliceRandom;
     use rand::Rng;
 
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn empty_tree_query() {
-        let mut tree = FixedSizeFenwickTree::<i32>::new(0);
+        let tree = FixedSizeFenwickTree::<i32>::new(0);
         assert!(tree.query(0).is_err());
         assert!(tree.query(1).is_err());
     }
@@ -113,7 +113,7 @@ mod tests {
 
         match tree.query(1) {
             Ok(_) => assert!(false),
-            Err(message) => assert_eq!(message, "Index is out of bounds."),
+            Err(message) => assert_eq!(message, TreeError::IndexOutOfBounds(1)),
         }
     }
 
