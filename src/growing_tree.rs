@@ -126,6 +126,20 @@ mod tests {
     use crate::FenwickTree;
 
     #[test]
+    fn empty_tree_query() {
+        let mut tree = GrowingFenwickTree::<i32>::new(0);
+        assert!(tree.query(0).is_ok_and(|val| val == 0));
+        assert!(tree.query(1).is_ok_and(|val| val == 0));
+    }
+
+    #[test]
+    fn one_element_tree_query() {
+        let tree = GrowingFenwickTree::<i32>::new(1);
+        assert!(tree.query(0).is_ok_and(|val| val == 0));
+        assert!(tree.query(1).is_ok_and(|val| val == 0));
+    }
+
+    #[test]
     fn test_no_upper_bound_error_is_raised() {
         let tree = GrowingFenwickTree::<i32>::new(0);
         assert_eq!(tree.query(100).unwrap(), 0);

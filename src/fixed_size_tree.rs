@@ -80,6 +80,20 @@ mod tests {
     }
 
     #[test]
+    fn empty_tree_query() {
+        let mut tree = FixedSizeFenwickTree::<i32>::new(0);
+        assert!(tree.query(0).is_err());
+        assert!(tree.query(1).is_err());
+    }
+
+    #[test]
+    fn one_element_tree_query() {
+        let tree = FixedSizeFenwickTree::<i32>::new(1);
+        assert!(tree.query(0).is_ok());
+        assert!(tree.query(1).is_err());
+    }
+
+    #[test]
     fn simple_tree_generation_with_queries() {
         let mut tree = FixedSizeFenwickTree::<i32>::new(32);
         for i in 0..32 {
