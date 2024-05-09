@@ -1,6 +1,6 @@
 [package]
 name = "fenwick-bit-tree"
-version = "2.0.0"
+version = "2.0.1"
 authors = ["Ilia Batii"]
 edition = "2021"
 include = ["src/*.rs", "Cargo.toml"]
