@@ -22,7 +22,7 @@
 //! ## Installation  
 //!
 //! ```bash
-//! cargo install fenwick-bit-tree
+//! cargo add fenwick-bit-tree
 //! ```
 //! 
 //! ## Test

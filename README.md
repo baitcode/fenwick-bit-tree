@@ -22,7 +22,7 @@ implmented for all primitive numeric types that support [`std::ops::AddAssign`],
 ### Installation
 
 ```bash
-cargo install fenwick-bit-tree
+cargo add fenwick-bit-tree
 ```
 
 ### Test
@@ -68,6 +68,6 @@ let val = tree.range_query(2, 16).unwrap(); // Will return aggregated sum of all
 assert_eq!(val, 10);
 ```
 
-Current version: 2.0.1
+Current version: 2.0.2
 
 License: MIT OR Apache-2.0
